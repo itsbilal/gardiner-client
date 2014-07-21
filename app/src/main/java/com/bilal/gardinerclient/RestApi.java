@@ -60,7 +60,7 @@ public class RestApi {
                 if (method == HTTP_POST) {
                     connection.setRequestMethod("POST");
                     connection.setDoOutput(true);
-                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset="+CHARSET);
 
                     OutputStream outputStream = connection.getOutputStream();
                     outputStream.write(requestBody.getBytes(CHARSET));
@@ -117,7 +117,7 @@ public class RestApi {
                     URLEncoder.encode(email, CHARSET),
                     URLEncoder.encode(password, CHARSET));
 
-            new doWork(m_activity).execute("/user/login", HTTP_GET, query);
+            new doWork(m_activity).execute("user/login", HTTP_POST, query);
         } catch (Exception e) {
             e.printStackTrace();
         }
