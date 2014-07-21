@@ -19,7 +19,7 @@ import java.net.URLEncoder;
 public class RestApi {
 
     // Constants
-    public static final String BASE_URL="http://localhost:8080/";
+    public static final String BASE_URL="http://10.0.2.2:8080/";
     public static final String CHARSET="UTF-8";
 
     public static final Integer HTTP_GET=1;
@@ -117,7 +117,7 @@ public class RestApi {
                     URLEncoder.encode(email, CHARSET),
                     URLEncoder.encode(password, CHARSET));
 
-            new doWork(m_activity).execute("/user/login", "GET", query);
+            new doWork(m_activity).execute("/user/login", HTTP_GET, query);
         } catch (Exception e) {
             e.printStackTrace();
         }

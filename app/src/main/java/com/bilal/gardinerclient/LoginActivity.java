@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -117,11 +118,11 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        /*if (!TextUtils.isEmpty(password)) { // && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
-        }
+        }*/
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
@@ -232,8 +233,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
         showProgress(false);
 
         try {
-            if (responseData.getInt("success") == 1) {
+            if (responseData.getString("type").compareTo("session") == 0) {
                 finish();
+                Log.d("LoginActivity", responseData.getString("token"));
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
