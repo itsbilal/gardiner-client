@@ -1,6 +1,7 @@
 package com.bilal.gardinerclient;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -32,7 +33,8 @@ public class MainActivity extends Activity {
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_contacts) {
-            Log.d("MainActivity", "Gotta start contacts!");
+            Intent startContacts = new Intent(this, ContactsActivity.class);
+            startActivity(startContacts);
             return true;
         }
         return super.onOptionsItemSelected(item);
