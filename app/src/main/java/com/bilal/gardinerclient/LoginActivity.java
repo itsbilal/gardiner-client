@@ -236,6 +236,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
             if (responseData.getString("type").compareTo("session") == 0) {
                 finish();
                 Log.d("LoginActivity", responseData.getString("token"));
+                RestApi.getInstance().setLoggedIn(responseData.getString("token"));
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();

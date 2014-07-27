@@ -28,6 +28,11 @@ public class RestApi {
     private boolean authenticated = false;
     private String token = null;
 
+    public void setLoggedIn(String token) {
+        this.token = token;
+        this.authenticated = true;
+    }
+
     // Classes
     private class doWork extends AsyncTask<Object, Void, JSONObject>{
         private NetworkActivity rootActivity;
