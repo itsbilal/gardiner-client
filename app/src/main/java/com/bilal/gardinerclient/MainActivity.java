@@ -2,6 +2,7 @@ package com.bilal.gardinerclient;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.bilal.gardinerclient.R;
@@ -29,6 +30,9 @@ public class MainActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            return true;
+        } else if (id == R.id.action_contacts) {
+            Log.d("MainActivity", "Gotta start contacts!");
             return true;
         }
         return super.onOptionsItemSelected(item);
