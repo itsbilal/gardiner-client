@@ -6,9 +6,11 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -47,6 +49,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "foo@example.com:hello", "bar@example.com:world"
     };
+
+    public static final String SHARED_PREF_NAME = "login";
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -144,6 +148,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
+
+            // Save in shared prefs
+            SharedPreferences settings = getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("email", email);
+            editor.putString("password", password);
+            editor.commit();
+
             RestApi api = RestApi.getInstance();
             api.login(this, email, password);
         }
@@ -229,12 +241,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
     }
 
     @Override
-    public void onNetworkCallResponse(int networkCall, JSONObject responseData) {
+    public void onNetworkCallResponse(RestApi.Endpoint networkCall, JSONObject responseData) {
         mAuthTask = null;
         showProgress(false);
 
         try {
-            if (responseData.getString("type").compareTo("session") == 0) {
+            if (!responseData.has("error")) {
                 finish();
                 Log.d("LoginActivity", responseData.getString("token"));
                 RestApi.getInstance().setLoggedIn(responseData.getString("token"));

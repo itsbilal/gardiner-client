@@ -2,18 +2,30 @@ package com.bilal.gardinerclient;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.bilal.gardinerclient.R;
 
-public class MainActivity extends Activity {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class MainActivity extends Activity implements NetworkActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SharedPreferences preferences = getSharedPreferences(LoginActivity.SHARED_PREF_NAME, MODE_PRIVATE);
+        RestApi restApi = RestApi.getInstance();
+        if (preferences.contains("email") && preferences.contains("password") && !restApi.getLoggedIn()) {
+            // Try a login
+
+            restApi.login(this, preferences.getString("email", null), preferences.getString("password", null));
+        }
     }
 
 
@@ -38,5 +50,16 @@ public class MainActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onNetworkCallResponse(RestApi.Endpoint networkCall, JSONObject responseData) {
+        if (networkCall == RestApi.Endpoint.USER_LOGIN) {
+            try {
+                RestApi.getInstance().setLoggedIn(responseData.getString("token"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

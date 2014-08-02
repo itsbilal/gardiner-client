@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.List;
@@ -25,6 +26,15 @@ public class ContactsListAdapter extends ArrayAdapter<Contact> {
         super(context, resource, objects);
     }
 
+    private View.OnClickListener getContactAddListener(Contact contact) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        };
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater li = LayoutInflater.from(getContext());
@@ -33,6 +43,7 @@ public class ContactsListAdapter extends ArrayAdapter<Contact> {
         Contact contact = getItem(position);
 
         ((TextView) convertView.findViewById(R.id.contact_name)).setText(contact.getName());
+        convertView.findViewById(R.id.contact_add).setOnClickListener(getContactAddListener(contact));
 
         return convertView;
     }

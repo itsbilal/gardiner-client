@@ -10,10 +10,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import com.bilal.gardinerclient.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContactsActivity extends ListActivity {
+public class ContactsActivity extends ListActivity implements NetworkActivity {
 
     public static int TAB_FRIENDS=1;
     public static int TAB_REQUESTS=50;
@@ -51,8 +55,15 @@ public class ContactsActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        friendsAdapter = new ContactsListAdapter(this, R.layout.listitem_contacts_friend, new Contact[]{new Contact("id", "name")});
+        RestApi restApi = RestApi.getInstance();
+
+        friendsAdapter = new ContactsListAdapter(this, R.layout.listitem_contacts_friend);
+        requestsAdapter = new ContactsListAdapter(this, R.layout.listitem_contacts_friend);
         setListAdapter(friendsAdapter);
+
+        // Load stuff into adapters
+        restApi.doContactSearch(this, null, null, null);
+        restApi.getContactRequests(this);
 
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -70,6 +81,27 @@ public class ContactsActivity extends ListActivity {
         actionBar.addTab(requestsTab);
     }
 
+    @Override
+    public void onNetworkCallResponse(RestApi.Endpoint networkCall, JSONObject responseData) {
+        try {
+
+            if (networkCall == RestApi.Endpoint.CONTACTS_SEARCH) {
+
+                JSONArray users = responseData.getJSONArray("users");
+                List<Contact> contactsList = new ArrayList<Contact>();
+
+                for (int i=0;i<users.length();i++) {
+                    contactsList.add(new Contact(users.getJSONObject(i)));
+                }
+
+                friendsAdapter.clear();
+                friendsAdapter.addAll(contactsList);
+                friendsAdapter.notifyDataSetChanged();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

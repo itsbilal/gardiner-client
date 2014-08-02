@@ -5,6 +5,6 @@ import org.json.JSONObject;
 /**
  * Created by bilal on 20/07/14.
  */
-public interface NetworkActivity {
-    void onNetworkCallResponse(int networkCall, JSONObject responseData);
+interface NetworkActivity {
+    void onNetworkCallResponse(RestApi.Endpoint networkCall, JSONObject responseData);
 }
