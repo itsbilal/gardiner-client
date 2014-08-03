@@ -40,7 +40,7 @@ class RestApi {
         USER_LOGIN,
         USER_RELOGIN,
         CONTACTS_SEARCH,
-        CONTACTS_REQUEST_SEND, CONTACTS_REQUESTS
+        CONTACTS_REQUEST_SEND, CONTACTS_REQUESTS_RESPOND, CONTACTS_REQUESTS
     }
 
     private boolean authenticated = false;
@@ -77,7 +77,7 @@ class RestApi {
             endpoint = m_endpoint;
             url = m_url;
             query = null;
-            method = null;
+            method = m_method;
         }
 
         public Endpoint getEndpoint() {
@@ -123,9 +123,9 @@ class RestApi {
             String endpoint = request.getUrl();
 
             try {
-                if (request.getMethod() == Method.HTTP_POST) {
+                if (request.getMethod() == Method.HTTP_POST && request.getQuery() != null) {
                     requestMap = request.getQuery();
-                } else if (request.getMethod() == Method.HTTP_GET) {
+                } else if (request.getMethod() == Method.HTTP_GET && request.getQuery() != null) {
                     endpoint += "?" + processQueryString(request.getQuery());
                 }
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -174,7 +174,7 @@ class RestApi {
                     responseStrBuilder.append(inputStr);
                 }
 
-                // DEbug output
+                // Debug output
                 Log.d("RestApi", responseStrBuilder.toString());
 
                 JSONObject responseJson = new JSONObject(responseStrBuilder.toString());
@@ -302,4 +302,13 @@ class RestApi {
                 Method.HTTP_POST));
     }
 
+    public void sendRequestReply(NetworkActivity context, String requestId, int i) {
+        HashMap<String, String> requestMap = new HashMap<String, String>();
+        requestMap.put("response", new Integer(i).toString());
+
+        Request request = new Request(Endpoint.CONTACTS_REQUESTS_RESPOND, "contacts/requests/" + requestId + "/respond",
+                requestMap, Method.HTTP_POST);
+
+        new doWork(context, Endpoint.CONTACTS_REQUESTS_RESPOND).execute(request);
+    }
 }

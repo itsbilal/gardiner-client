@@ -34,10 +34,14 @@ public class ContactsActivity extends ListActivity implements NetworkActivity {
 
         @Override
         public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-            if (mTabType == TAB_FRIENDS)
+            if (mTabType == TAB_FRIENDS) {
                 Log.d("ContactsActivity", "Friends tab selected");
-            else
+
+                ContactsActivity.this.setListAdapter(friendsAdapter);
+            } else {
                 Log.d("ContactsActivity", "Requests tab selected");
+                ContactsActivity.this.setListAdapter(requestsAdapter);
+            }
         }
 
         @Override
@@ -59,7 +63,6 @@ public class ContactsActivity extends ListActivity implements NetworkActivity {
 
         friendsAdapter = new ContactsListAdapter(this, R.layout.listitem_contacts_friend);
         requestsAdapter = new ContactsListAdapter(this, R.layout.listitem_contacts_friend);
-        setListAdapter(friendsAdapter);
 
         // Load stuff into adapters
         restApi.doContactSearch(this, null, null, null);
@@ -84,7 +87,6 @@ public class ContactsActivity extends ListActivity implements NetworkActivity {
     @Override
     public void onNetworkCallResponse(RestApi.Endpoint networkCall, JSONObject responseData) {
         try {
-
             if (networkCall == RestApi.Endpoint.CONTACTS_SEARCH) {
 
                 JSONArray users = responseData.getJSONArray("users");
@@ -97,6 +99,23 @@ public class ContactsActivity extends ListActivity implements NetworkActivity {
                 friendsAdapter.clear();
                 friendsAdapter.addAll(contactsList);
                 friendsAdapter.notifyDataSetChanged();
+
+            } else if (networkCall == RestApi.Endpoint.CONTACTS_REQUESTS) {
+                JSONArray requests = responseData.getJSONArray("requests");
+                List<Contact> requestsList = new ArrayList<Contact>();
+
+                for (int i=0;i<requests.length();i++) {
+                    JSONObject request = requests.getJSONObject(i);
+                    JSONObject sender = request.getJSONObject("from");
+                    Contact contact = new Contact(sender);
+                    contact.setRequestId(request.getString("id"));
+
+                    requestsList.add(contact);
+                }
+
+                requestsAdapter.clear();
+                requestsAdapter.addAll(requestsList);
+                requestsAdapter.notifyDataSetChanged();
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -9,10 +9,27 @@ import org.json.JSONObject;
 public class Contact {
     private String name;
     private String id;
+    private String requestId = null;
+
+    public enum Type {
+        REQUEST,
+        FRIEND,
+        STANGER
+    }
 
     public Contact(String id, String name) {
         this.name = name;
         this.id = id;
+    }
+
+    public Contact(String id, String name, String requestId) {
+        this.name = name;
+        this.id = id;
+        this.requestId = requestId;
+    }
+
+    public String getRequestId() {
+        return requestId;
     }
 
     public Contact (JSONObject object) throws JSONException {
@@ -26,6 +43,22 @@ public class Contact {
 
     public String getId() {
         return id;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    public void sendRequest(NetworkActivity m_activity) {
+        RestApi api = RestApi.getInstance();
+
+        api.sendContactRequest(m_activity, this);
+    }
+
+    public void acceptRequest(NetworkActivity context) {
+        RestApi api = RestApi.getInstance();
+
+        api.sendRequestReply(context, requestId, 1);
     }
 
     @Override

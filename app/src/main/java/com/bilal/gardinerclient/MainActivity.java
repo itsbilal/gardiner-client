@@ -25,6 +25,10 @@ public class MainActivity extends Activity implements NetworkActivity {
             // Try a login
 
             restApi.login(this, preferences.getString("email", null), preferences.getString("password", null));
+        } else if (!preferences.contains("email")) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish(); // Get back to this activity later
         }
     }
 

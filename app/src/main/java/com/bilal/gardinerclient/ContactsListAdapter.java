@@ -26,11 +26,15 @@ public class ContactsListAdapter extends ArrayAdapter<Contact> {
         super(context, resource, objects);
     }
 
-    private View.OnClickListener getContactAddListener(Contact contact) {
+    private View.OnClickListener getContactAddListener(final Contact contact) {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (contact.getRequestId() == null) { // Send 'em a request
+                    contact.sendRequest((NetworkActivity)getContext());
+                } else {
+                    contact.acceptRequest((NetworkActivity)getContext());
+                }
             }
         };
     }
