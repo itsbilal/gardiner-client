@@ -21,6 +21,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * Created by bilal on 20/07/14.
@@ -66,6 +67,8 @@ class RestApi {
         private Map<String, String> query;
         private Method method;
 
+        private OnNetworkDone onDone = null;
+
         public Request(Endpoint m_endpoint, String m_url, Map<String, String> m_query, Method m_method) {
             endpoint = m_endpoint;
             url = m_url;
@@ -95,12 +98,21 @@ class RestApi {
         public Method getMethod() {
             return method;
         }
+
+        public OnNetworkDone getOnDone() {
+            return onDone;
+        }
+
+        public void setOnDone(OnNetworkDone onDone) {
+            this.onDone = onDone;
+        }
     }
 
     // Classes
     private class doWork extends AsyncTask<Object, Void, JSONObject>{
         private NetworkActivity rootActivity;
         private Endpoint endpoint;
+        private Request currentRequest;
         private Request originalRequest;
 
         public doWork(NetworkActivity m_rootActivity, Endpoint m_endpoint) {
@@ -117,16 +129,16 @@ class RestApi {
 
         @Override
         protected JSONObject doInBackground(Object... params) {
-            Request request = (Request) params[0];
+            currentRequest = (Request) params[0];
             Map requestMap = null;
             HttpURLConnection connection = null;
-            String endpoint = request.getUrl();
+            String endpoint = currentRequest.getUrl();
 
             try {
-                if (request.getMethod() == Method.HTTP_POST && request.getQuery() != null) {
-                    requestMap = request.getQuery();
-                } else if (request.getMethod() == Method.HTTP_GET && request.getQuery() != null) {
-                    endpoint += "?" + processQueryString(request.getQuery());
+                if (currentRequest.getMethod() == Method.HTTP_POST && currentRequest.getQuery() != null) {
+                    requestMap = currentRequest.getQuery();
+                } else if (currentRequest.getMethod() == Method.HTTP_GET && currentRequest.getQuery() != null) {
+                    endpoint += "?" + processQueryString(currentRequest.getQuery());
                 }
             } catch (ArrayIndexOutOfBoundsException e) {
                 requestMap = null;
@@ -143,7 +155,7 @@ class RestApi {
                     connection.addRequestProperty("X-WWW-Authenticate", token);
                 }
 
-                if (request.getMethod() == Method.HTTP_POST) {
+                if (currentRequest.getMethod() == Method.HTTP_POST) {
                     connection.setRequestMethod("POST");
                     connection.setDoOutput(true);
                     connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=" + CHARSET);
@@ -160,7 +172,7 @@ class RestApi {
                     is = connection.getInputStream();
                 } catch (FileNotFoundException e) {
                     Log.e("RestApi", "Response code: " + connection.getResponseCode());
-                    originalRequest = request;
+                    originalRequest = currentRequest;
                     is = connection.getErrorStream();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -226,6 +238,14 @@ class RestApi {
                 e.printStackTrace();
             }
 
+            // Call the callable, if set
+            if (currentRequest != null && currentRequest.getOnDone() != null) {
+                try {
+                    currentRequest.getOnDone().setResponse(response).call();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             rootActivity.onNetworkCallResponse(endpoint, response);
         }
     };
@@ -300,6 +320,14 @@ class RestApi {
     public void sendContactRequest(NetworkActivity m_activity, Contact contact) {
         new doWork(m_activity, Endpoint.CONTACTS_REQUEST_SEND).execute(new Request(Endpoint.CONTACTS_REQUEST_SEND,"contacts/user/" + contact.getId() + "/request",
                 Method.HTTP_POST));
+    }
+
+    public void sendContactRequest(NetworkActivity m_activity, Contact contact, OnNetworkDone onNetworkDone) {
+        Request request = new Request(Endpoint.CONTACTS_REQUEST_SEND,"contacts/user/" + contact.getId() + "/request",
+                Method.HTTP_POST);
+        request.setOnDone(onNetworkDone);
+
+        new doWork(m_activity, Endpoint.CONTACTS_REQUEST_SEND).execute(request);
     }
 
     public void sendRequestReply(NetworkActivity context, String requestId, int i) {

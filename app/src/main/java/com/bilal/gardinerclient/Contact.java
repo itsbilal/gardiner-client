@@ -55,6 +55,12 @@ public class Contact {
         api.sendContactRequest(m_activity, this);
     }
 
+    public void sendRequest(NetworkActivity m_activity, OnNetworkDone onNetworkDone) {
+        RestApi api = RestApi.getInstance();
+
+        api.sendContactRequest(m_activity, this, onNetworkDone);
+    }
+
     public void acceptRequest(NetworkActivity context) {
         RestApi api = RestApi.getInstance();
 
