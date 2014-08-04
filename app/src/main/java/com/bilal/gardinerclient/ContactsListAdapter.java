@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.List;
@@ -32,14 +33,18 @@ public class ContactsListAdapter extends ArrayAdapter<Contact> {
         return new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                view.setEnabled(false);
-                
+                view.setClickable(false);
+                final Spinner spinner = (Spinner) ((ViewGroup)view.getParent()).findViewById(R.id.contact_list_spinner);
+                spinner.setVisibility(View.VISIBLE);
+                view.setVisibility(View.GONE);
 
                 OnNetworkDone onDone = new OnNetworkDone() {
                     @Override
                     public Void call() throws Exception {
+                        spinner.setVisibility(View.GONE);
+                        view.setVisibility(View.VISIBLE);
                         if (response.getInt("success") == 1) {
-                            ((ImageButton)view).setImageDrawable(getContext().getResources().getDrawable(android.R.drawable.ic_menu_add));
+                            ((ImageButton)view).setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_action_done));
                             Log.d("ContactListAdapter", "Successful reenable");
                         }
 
@@ -64,7 +69,13 @@ public class ContactsListAdapter extends ArrayAdapter<Contact> {
         Contact contact = getItem(position);
 
         ((TextView) convertView.findViewById(R.id.contact_name)).setText(contact.getName());
-        convertView.findViewById(R.id.contact_add).setOnClickListener(getContactAddListener(contact));
+        ImageButton addButton = (ImageButton) convertView.findViewById(R.id.contact_add);
+        addButton.setOnClickListener(getContactAddListener(contact));
+
+        if (contact.getType() == Contact.Type.FRIEND || contact.getType() == Contact.Type.REQUESTED) {
+            addButton.setClickable(false);
+            addButton.setVisibility(View.GONE);
+        }
 
         return convertView;
     }
