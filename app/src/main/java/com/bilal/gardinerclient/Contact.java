@@ -67,6 +67,12 @@ public class Contact {
         api.sendRequestReply(context, requestId, 1);
     }
 
+    public void acceptRequest(NetworkActivity context, OnNetworkDone onDone) {
+        RestApi api = RestApi.getInstance();
+
+        api.sendRequestReply(context, requestId, 1, onDone);
+    }
+
     @Override
     public String toString() {
         return name;

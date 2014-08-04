@@ -339,4 +339,15 @@ class RestApi {
 
         new doWork(context, Endpoint.CONTACTS_REQUESTS_RESPOND).execute(request);
     }
+
+    public void sendRequestReply(NetworkActivity context, String requestId, int i, OnNetworkDone onDone) {
+        HashMap<String, String> requestMap = new HashMap<String, String>();
+        requestMap.put("response", new Integer(i).toString());
+
+        Request request = new Request(Endpoint.CONTACTS_REQUESTS_RESPOND, "contacts/requests/" + requestId + "/respond",
+                requestMap, Method.HTTP_POST);
+        request.setOnDone(onDone);
+
+        new doWork(context, Endpoint.CONTACTS_REQUESTS_RESPOND).execute(request);
+    }
 }

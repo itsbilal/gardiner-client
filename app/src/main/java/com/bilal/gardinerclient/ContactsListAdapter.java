@@ -33,22 +33,24 @@ public class ContactsListAdapter extends ArrayAdapter<Contact> {
             @Override
             public void onClick(final View view) {
                 view.setEnabled(false);
+                
+
+                OnNetworkDone onDone = new OnNetworkDone() {
+                    @Override
+                    public Void call() throws Exception {
+                        if (response.getInt("success") == 1) {
+                            ((ImageButton)view).setImageDrawable(getContext().getResources().getDrawable(android.R.drawable.ic_menu_add));
+                            Log.d("ContactListAdapter", "Successful reenable");
+                        }
+
+                        return null;
+                    }
+                };
 
                 if (contact.getRequestId() == null) { // Send 'em a request
-                    contact.sendRequest((NetworkActivity)getContext(), new OnNetworkDone(){
-
-                        @Override
-                        public Void call() throws Exception {
-                            if (response.getInt("success") == 1) {
-                                ((ImageButton)view).setImageDrawable(getContext().getResources().getDrawable(android.R.drawable.ic_menu_add));
-                                Log.d("ContactListAdapter", "Successful reenable");
-                            }
-
-                            return null;
-                        }
-                    });
+                    contact.sendRequest((NetworkActivity)getContext(), onDone);
                 } else {
-                    contact.acceptRequest((NetworkActivity)getContext());
+                    contact.acceptRequest((NetworkActivity)getContext(), onDone);
                 }
             }
         };
