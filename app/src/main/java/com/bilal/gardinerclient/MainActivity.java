@@ -1,6 +1,7 @@
 package com.bilal.gardinerclient;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,12 +13,12 @@ import com.bilal.gardinerclient.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends Activity implements NetworkActivity {
+public class MainActivity extends ListActivity implements NetworkActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.activity_main);
 
         SharedPreferences preferences = getSharedPreferences(LoginActivity.SHARED_PREF_NAME, MODE_PRIVATE);
         RestApi restApi = RestApi.getInstance();
@@ -29,9 +30,14 @@ public class MainActivity extends Activity implements NetworkActivity {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish(); // Get back to this activity later
+        } else if (restApi.getLoggedIn()) {
+            refreshLocationsList();
         }
     }
 
+    private void refreshLocationsList() {
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -64,6 +70,8 @@ public class MainActivity extends Activity implements NetworkActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            refreshLocationsList();
         }
     }
 }
