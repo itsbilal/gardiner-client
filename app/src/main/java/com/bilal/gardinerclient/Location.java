@@ -57,12 +57,6 @@ public class Location implements Comparable<Location> {
 
     @Override
     public int compareTo(Location location) {
-        if (location.getPosted().after(this.posted)) {
-            return 1;
-        } else if (location.getPosted().before(this.posted)) {
-            return -1;
-        }
-
-        return 0;
+        return this.posted.compareTo(location.getPosted());
     }
 }

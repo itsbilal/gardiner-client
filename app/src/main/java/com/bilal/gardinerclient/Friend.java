@@ -32,6 +32,7 @@ public class Friend extends Contact {
 
     public List<Location> getLocations() {
         Collections.sort(locations);
+        Collections.reverse(locations);
         return locations;
     }
 

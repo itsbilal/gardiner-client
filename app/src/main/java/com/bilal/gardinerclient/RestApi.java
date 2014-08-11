@@ -41,7 +41,7 @@ class RestApi {
         USER_LOGIN,
         USER_RELOGIN,
         CONTACTS_SEARCH,
-        CONTACTS_REQUEST_SEND, CONTACTS_REQUESTS_RESPOND, CONTACTS_REQUESTS
+        CONTACTS_REQUEST_SEND, CONTACTS_REQUESTS_RESPOND, LOCATIONS_HOME, CONTACTS_REQUESTS
     }
 
     private boolean authenticated = false;
@@ -349,5 +349,11 @@ class RestApi {
         request.setOnDone(onDone);
 
         new doWork(context, Endpoint.CONTACTS_REQUESTS_RESPOND).execute(request);
+    }
+
+    public void getLocations(NetworkActivity context) {
+        Request request = new Request(Endpoint.LOCATIONS_HOME, "locations/", Method.HTTP_GET);
+
+        new doWork(context, request.getEndpoint()).execute(request);
     }
 }
