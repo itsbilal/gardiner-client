@@ -1,5 +1,8 @@
 package com.bilal.gardinerclient;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,7 +15,7 @@ import java.util.Date;
 /**
  * Created by bilal on 10/08/14.
  */
-public class Location implements Comparable<Location> {
+public class Location implements Comparable<Location>, Parcelable {
     private String id;
     private Double latX;
     private Double latY;
@@ -58,5 +61,36 @@ public class Location implements Comparable<Location> {
     @Override
     public int compareTo(Location location) {
         return this.posted.compareTo(location.getPosted());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Parcelable.Creator<Location> CREATOR
+            = new Parcelable.Creator<Location>() {
+        public Location createFromParcel(Parcel in) {
+            return new Location(in);
+        }
+
+        public Location[] newArray(int size) {
+            return new Location[size];
+        }
+    };
+
+    private Location(Parcel parcel) {
+        this.id = parcel.readString();
+        this.latX = parcel.readDouble();
+        this.latY = parcel.readDouble();
+        this.posted = new Date(parcel.readLong());
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(this.id);
+        parcel.writeDouble(this.latX);
+        parcel.writeDouble(this.latY);
+        parcel.writeLong(this.posted.getTime());
     }
 }

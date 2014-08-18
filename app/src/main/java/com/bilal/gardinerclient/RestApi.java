@@ -41,7 +41,7 @@ class RestApi {
         USER_LOGIN,
         USER_RELOGIN,
         CONTACTS_SEARCH,
-        CONTACTS_REQUEST_SEND, CONTACTS_REQUESTS_RESPOND, LOCATIONS_HOME, CONTACTS_REQUESTS
+        CONTACTS_REQUEST_SEND, CONTACTS_REQUESTS_RESPOND, LOCATIONS_HOME, LOCATIONS_NEW, CONTACTS_REQUESTS
     }
 
     private boolean authenticated = false;
@@ -223,7 +223,7 @@ class RestApi {
                 if (response.has("error") && response.has("code") && response.getInt("code") == 1000) {
                     RestApi.this.setLoggedOut();
 
-                    SharedPreferences prefs = ((Activity) rootActivity).getSharedPreferences(LoginActivity.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+                    SharedPreferences prefs = ((Context) rootActivity).getSharedPreferences(LoginActivity.SHARED_PREF_NAME, Context.MODE_PRIVATE);
                     HashMap<String, String> requestMap = new HashMap<String, String>();
                     requestMap.put("email", prefs.getString("email", null));
                     requestMap.put("password", prefs.getString("password", null));
@@ -353,6 +353,17 @@ class RestApi {
 
     public void getLocations(NetworkActivity context) {
         Request request = new Request(Endpoint.LOCATIONS_HOME, "locations/", Method.HTTP_GET);
+
+        new doWork(context, request.getEndpoint()).execute(request);
+    }
+
+    public void postLocation(NetworkActivity context, Location location, OnNetworkDone onNetworkDone) {
+        HashMap<String, String> requestMap = new HashMap<String, String>();
+        requestMap.put("latX", location.getLatX().toString());
+        requestMap.put("latY", location.getLatY().toString());
+
+        Request request = new Request(Endpoint.LOCATIONS_NEW, "locations/new", requestMap, Method.HTTP_POST);
+        request.setOnDone(onNetworkDone);
 
         new doWork(context, request.getEndpoint()).execute(request);
     }
