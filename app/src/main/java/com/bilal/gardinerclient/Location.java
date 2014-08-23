@@ -30,6 +30,13 @@ public class Location implements Comparable<Location>, Parcelable {
         this.posted = posted;
     }
 
+    public Location(Double latX, Double latY) {
+        this.id = null;
+        this.latX = latX;
+        this.latY = latY;
+        this.posted = null;
+    }
+
     public Location(JSONObject response) throws JSONException {
         this.id = response.getString("id");
         this.latX = response.getDouble("latX");
@@ -92,5 +99,10 @@ public class Location implements Comparable<Location>, Parcelable {
         parcel.writeDouble(this.latX);
         parcel.writeDouble(this.latY);
         parcel.writeLong(this.posted.getTime());
+    }
+
+    public void onPost(String id) {
+        this.id = id;
+        this.posted = new Date();
     }
 }

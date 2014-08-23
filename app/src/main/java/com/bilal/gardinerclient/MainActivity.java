@@ -74,6 +74,9 @@ public class MainActivity extends ListActivity implements NetworkActivity {
             Intent startContacts = new Intent(this, ContactsActivity.class);
             startActivity(startContacts);
             return true;
+        } else if (id == R.id.action_update_location) {
+            Intent updateLocation = new Intent(this, LocationUpdateService.class);
+            startService(updateLocation);
         }
         return super.onOptionsItemSelected(item);
     }

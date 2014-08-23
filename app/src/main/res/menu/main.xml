@@ -6,6 +6,11 @@
         android:orderInCategory="15"
         android:icon="@drawable/ic_action_group"
         android:showAsAction="always" />
+    <item android:id="@+id/action_update_location"
+        android:title="Update Location"
+        android:orderInCategory="10"
+        android:icon="@android:drawable/ic_menu_add"
+        android:showAsAction="ifRoom" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
