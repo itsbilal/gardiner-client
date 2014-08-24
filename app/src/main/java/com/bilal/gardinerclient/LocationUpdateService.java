@@ -23,7 +23,7 @@ public class LocationUpdateService extends Service implements NetworkActivity, G
         GooglePlayServicesClient.OnConnectionFailedListener
 {
 
-    private static final Boolean MOCK_LOCATIONS = true;
+    private static final Boolean MOCK_LOCATIONS = false;
     private LocationClient locationClient;
 
     @Override

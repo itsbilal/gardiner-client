@@ -1,16 +1,21 @@
 package com.bilal.gardinerclient;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.ListActivity;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.bilal.gardinerclient.R;
 
@@ -45,13 +50,25 @@ public class MainActivity extends ListActivity implements NetworkActivity {
             startActivity(intent);
             finish(); // Get back to this activity later
         } else if (restApi.getLoggedIn()) {
+
             refreshLocationsList();
         }
     }
 
     private void refreshLocationsList() {
-        RestApi restApi = RestApi.getInstance();
+        AlarmManager alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, LocationUpdateService.class);
+        PendingIntent alarmIntent = PendingIntent.getService(this, 0, intent, 0);
 
+        if (alarmMgr != null) {
+            alarmMgr.cancel(alarmIntent);
+
+            alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), AlarmManager.INTERVAL_HOUR, alarmIntent);
+
+            Toast.makeText(this, "Location will be updated", Toast.LENGTH_SHORT).show();
+        }
+
+        RestApi restApi = RestApi.getInstance();
         restApi.getLocations(this);
     }
 
