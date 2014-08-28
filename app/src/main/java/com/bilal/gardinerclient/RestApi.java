@@ -29,7 +29,7 @@ import java.util.concurrent.Callable;
 class RestApi {
 
     // Constants
-    public static final String BASE_URL="http://10.0.2.2:8080/";
+    public static final String BASE_URL="http://104.131.210.101:8080/";
     public static final String CHARSET="UTF-8";
 
     public static enum Method {
@@ -115,9 +115,8 @@ class RestApi {
         private Request currentRequest;
         private Request originalRequest;
 
-        public doWork(NetworkActivity m_rootActivity, Endpoint m_endpoint) {
+        public doWork(NetworkActivity m_rootActivity) {
             rootActivity = m_rootActivity;
-            endpoint = m_endpoint;
             originalRequest = null;
         }
 
@@ -130,6 +129,8 @@ class RestApi {
         @Override
         protected JSONObject doInBackground(Object... params) {
             currentRequest = (Request) params[0];
+            endpoint = currentRequest.getEndpoint();
+
             Map requestMap = null;
             HttpURLConnection connection = null;
             String endpoint = currentRequest.getUrl();
@@ -209,7 +210,7 @@ class RestApi {
                     RestApi.this.setLoggedIn(response.getString("token"));
                     Log.d("RestApi", "Successful relogin: " + response.getString("token"));
 
-                    new doWork(rootActivity, originalRequest.getEndpoint()).execute(originalRequest);
+                    new doWork(rootActivity).execute(originalRequest);
                     return;
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -254,7 +255,7 @@ class RestApi {
     private static RestApi instance = null;
 
     protected RestApi() {
-
+        // Don't allow initializing of this class outside it
     }
 
     public static RestApi getInstance() {
@@ -291,7 +292,7 @@ class RestApi {
         requestMap.put("email", email);
         requestMap.put("password", password);
 
-        new doWork(m_activity, Endpoint.USER_LOGIN).execute(new Request(Endpoint.USER_LOGIN,
+        new doWork(m_activity).execute(new Request(Endpoint.USER_LOGIN,
                 "user/login",
                 requestMap,
                 Method.HTTP_POST));
@@ -310,15 +311,15 @@ class RestApi {
             requestMap.put("location", location);
         }
 
-        new doWork(m_activity, Endpoint.CONTACTS_SEARCH).execute(new Request(Endpoint.CONTACTS_SEARCH, "contacts/search", requestMap, Method.HTTP_GET));
+        new doWork(m_activity).execute(new Request(Endpoint.CONTACTS_SEARCH, "contacts/search", requestMap, Method.HTTP_GET));
     }
 
     public void getContactRequests(NetworkActivity m_activity) {
-        new doWork(m_activity, Endpoint.CONTACTS_REQUESTS).execute(new Request(Endpoint.CONTACTS_REQUESTS, "contacts/requests", Method.HTTP_GET));
+        new doWork(m_activity).execute(new Request(Endpoint.CONTACTS_REQUESTS, "contacts/requests", Method.HTTP_GET));
     }
 
     public void sendContactRequest(NetworkActivity m_activity, Contact contact) {
-        new doWork(m_activity, Endpoint.CONTACTS_REQUEST_SEND).execute(new Request(Endpoint.CONTACTS_REQUEST_SEND,"contacts/user/" + contact.getId() + "/request",
+        new doWork(m_activity).execute(new Request(Endpoint.CONTACTS_REQUEST_SEND,"contacts/user/" + contact.getId() + "/request",
                 Method.HTTP_POST));
     }
 
@@ -327,7 +328,7 @@ class RestApi {
                 Method.HTTP_POST);
         request.setOnDone(onNetworkDone);
 
-        new doWork(m_activity, Endpoint.CONTACTS_REQUEST_SEND).execute(request);
+        new doWork(m_activity).execute(request);
     }
 
     public void sendRequestReply(NetworkActivity context, String requestId, int i) {
@@ -337,7 +338,7 @@ class RestApi {
         Request request = new Request(Endpoint.CONTACTS_REQUESTS_RESPOND, "contacts/requests/" + requestId + "/respond",
                 requestMap, Method.HTTP_POST);
 
-        new doWork(context, Endpoint.CONTACTS_REQUESTS_RESPOND).execute(request);
+        new doWork(context).execute(request);
     }
 
     public void sendRequestReply(NetworkActivity context, String requestId, int i, OnNetworkDone onDone) {
@@ -348,13 +349,13 @@ class RestApi {
                 requestMap, Method.HTTP_POST);
         request.setOnDone(onDone);
 
-        new doWork(context, Endpoint.CONTACTS_REQUESTS_RESPOND).execute(request);
+        new doWork(context).execute(request);
     }
 
     public void getLocations(NetworkActivity context) {
         Request request = new Request(Endpoint.LOCATIONS_HOME, "locations/", Method.HTTP_GET);
 
-        new doWork(context, request.getEndpoint()).execute(request);
+        new doWork(context).execute(request);
     }
 
     public void postLocation(NetworkActivity context, Location location, OnNetworkDone onNetworkDone) {
@@ -365,6 +366,6 @@ class RestApi {
         Request request = new Request(Endpoint.LOCATIONS_NEW, "locations/new", requestMap, Method.HTTP_POST);
         request.setOnDone(onNetworkDone);
 
-        new doWork(context, request.getEndpoint()).execute(request);
+        new doWork(context).execute(request);
     }
 }
