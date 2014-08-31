@@ -10,5 +10,8 @@
     <string name="tab_friends_text">Friends</string>
     <string name="tab_requests_text">Requests</string>
     <string name="login_activity_title">Login - Gardiner</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="activity_profile_places">PLACES</string>
+    <string name="activity_profile_add_place">Add place</string>
 
 </resources>
